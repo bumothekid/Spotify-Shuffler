@@ -1,4 +1,3 @@
-import json
 import random
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
