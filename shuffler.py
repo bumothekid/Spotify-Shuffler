@@ -1,11 +1,29 @@
+import yaml
 import random
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+try:
+    with open("config.yml", "r") as f:
+        config = yaml.load(f, yaml.FullLoader)
+
+    client_id = config["client_id"]
+    client_secret = config["client_secret"]
+
+    if not client_id or not client_secret or client_id in ["", " "] or client_secret in ["", " "]:
+        raise RuntimeError("Please provide a valid client_id and valid client_secret in the config.yml file")
+
+except FileNotFoundError as e:
+    raise FileNotFoundError("Please create a config.yml file with a client_id and client_secret") from e
+
+except KeyError as e:
+    raise KeyError("Please check your configuration file and set the client_id and client_secret variable") from e
+
+
 tokenInfo = "token_info"
 authorization = SpotifyOAuth(
-        client_id="", # Your Client ID here
-        client_secret="", # Your Client Secret here
+        client_id=client_id,
+        client_secret=client_secret,
         redirect_uri="http://localhost:8888/callback",
         scope="playlist-read-collaborative playlist-read-private playlist-modify-private playlist-modify-public"
     )
@@ -37,9 +55,7 @@ def shufflePlaylistsByURI(playlistURI: str) -> bool:
             break
     
     user.playlist_remove_all_occurrences_of_items(playlistID, tracks)
-    print(tracks)
     random.shuffle(tracks)
-    print(tracks)
     offset = 0
 
     while True:
@@ -55,10 +71,10 @@ def shufflePlaylistsByURI(playlistURI: str) -> bool:
 
 
 if __name__ == "__main__":
-    sampleURI = "spotify:playlist:2UKjwdfbKRZrYSOncodK4L"
+    sampleURI = "spotify:playlist:2UKqwpfrKKZrLFBncodK4L"
     playlistURI = input(f"The playlist URI to shuffle: (Sample URI: {sampleURI})\n")
 
-    if len(playlistURI.split(":")) != 3 or playlistURI.split(":")[1] != "playlist" or playlistURI == sampleURI:
+    if len(playlistURI.split(":")) != 3 or playlistURI.split(":")[1] != "playlist":
         raise ValueError("PlaylistURI invalid")
     
     success = shufflePlaylistsByURI(playlistURI)
