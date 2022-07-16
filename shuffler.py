@@ -37,7 +37,7 @@ def shufflePlaylistsByURI(playlistURI: str) -> bool:
         user.playlist(playlistID)
     except Exception:
         return False
-    
+
     tracks = []
     offset = 0
 
@@ -53,8 +53,17 @@ def shufflePlaylistsByURI(playlistURI: str) -> bool:
 
         if len(items) != 100:
             break
-    
-    user.playlist_remove_all_occurrences_of_items(playlistID, tracks)
+
+    tracksCopy = tracks.copy()
+
+    while True:
+        user.playlist_remove_all_occurrences_of_items(playlistID, tracksCopy[:100])
+
+        del tracksCopy[:100]
+
+        if not tracksCopy:
+            break
+
     random.shuffle(tracks)
     offset = 0
 
